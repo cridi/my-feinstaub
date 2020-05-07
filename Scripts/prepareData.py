@@ -47,8 +47,6 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
     StaubPlot = plt.subplot2grid((2,1),(0,0))
     TempPlot  = plt.subplot2grid((2,1),(1,0))
 
-
-
     #Oben
     StaubPlot.set_title(" FeinStaub 10/2,5µm ")
     formatter = mdates.ConciseDateFormatter(timeStaub_arr, tz=pytz.timezone('Europe/Berlin') )
@@ -78,6 +76,7 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
     month = str(yesterday.month) if yesterday.month >= 10 else "0"+str(yesterday.month)
     day   = str(yesterday.day)   if yesterday.day   >= 10 else "0"+str(yesterday.day)
 
-    plt.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=90)
+    plt.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=300)
+    plt.savefig('../Graphs/Daily/current_graph.png', dpi=300)
 
     plt.show()
