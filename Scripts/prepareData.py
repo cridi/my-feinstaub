@@ -6,10 +6,18 @@ from matplotlib import dates as mdates
 from datetime import *
 from dateutil.tz import *
 import numpy as np
-import array as arr
 import matplotlib
-
 import dateutil.parser
+import pytz
+
+def convert_datetime_timezone(dt, tz1, tz2):
+    tz1 = pytz.timezone(tz1)
+    tz2 = pytz.timezone(tz2)
+
+    dt = tz1.localize(dt)
+    dt = dt.astimezone(tz2)
+
+    return dt
 
 with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
     feinstaub_reader = csv.DictReader(feinstaub_file, delimiter = ';')
@@ -23,7 +31,7 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
 
     for row in feinstaub_reader:
         timestamp = dateutil.parser.parse(row["timestamp"])
-        timeStaub_arr.append(timestamp)
+        timeStaub_arr.append(convert_datetime_timezone(timestamp, 'UTC', 'Europe/Berlin'))
         P1_arr.append(float(row["P1"]))
         P2_arr.append(float(row["P2"]))
 
@@ -32,7 +40,7 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
 
         for row in temperature_reader:
             timestamp = dateutil.parser.parse(row["timestamp"])
-            timeTemp_arr.append(timestamp)
+            timeTemp_arr.append(convert_datetime_timezone(timestamp, 'UTC', 'Europe/Berlin'))
             temp_arr.append(float(row["temperature"]))
             hum_arr.append(float(row["humidity"]))
 
@@ -41,19 +49,37 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
 
     #10:10 Wasser hingestellt
 
-    formatter = mdates.ConciseDateFormatter(timeStaub_arr)
+    formatter = mdates.ConciseDateFormatter(timeStaub_arr, tz=pytz.timezone('Europe/Berlin') )
+
     #Oben
     StaubPlot.set_title(" FeinStaub 10/2,5µm ")
     StaubPlot.xaxis.set_major_formatter(formatter)
-    StaubPlot.plot(timeStaub_arr, P1_arr, 'm' )
-    StaubPlot.plot(timeStaub_arr, P2_arr, 'c')
+    handleP1, = StaubPlot.plot(timeStaub_arr, P1_arr, 'm' )
+    handleP2, = StaubPlot.plot(timeStaub_arr, P2_arr, 'c' )
+    StaubPlot.legend((handleP1, handleP2), ('10 µm', '2,5 µm'), loc='upper right')
     StaubPlot.grid(True)
 
+    formatter = mdates.ConciseDateFormatter(timeStaub_arr, tz=pytz.timezone('Europe/Berlin') )
+
     #Unten
-    TempPlot.set_title(" Temperature & Humidity " )
+    TempPlot.set_title(" Temperatur & Feuchte " )
     TempPlot.xaxis.set_major_formatter(formatter)
-    TempPlot.plot(timeTemp_arr, temp_arr, 'r')
-    TempPlot.plot(timeTemp_arr, hum_arr)
+
+    handleTemp, = TempPlot.plot(timeTemp_arr, temp_arr, 'r')
+    handleHum,  = TempPlot.plot(timeTemp_arr, hum_arr)
+    TempPlot.legend((handleHum, handleTemp), ( 'Feuchte', 'Temperatur'), loc='upper right')
     TempPlot.grid(True)
+
+
+    #Get todays Date
+    today = date.today()
+    # Yesterday date
+    yesterday = today - timedelta(days = 1)
+    #Adjust to linkformat
+    year  = str(yesterday.year)
+    month = str(yesterday.month) if yesterday.month >= 10 else "0"+str(yesterday.month)
+    day   = str(yesterday.day)   if yesterday.day   >= 10 else "0"+str(yesterday.day)
+
+    plt.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=90)
 
     plt.show()
