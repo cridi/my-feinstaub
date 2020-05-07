@@ -76,7 +76,9 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
     month = str(yesterday.month) if yesterday.month >= 10 else "0"+str(yesterday.month)
     day   = str(yesterday.day)   if yesterday.day   >= 10 else "0"+str(yesterday.day)
 
-    plt.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=300)
-    plt.savefig('../Graphs/Daily/current_graph.png', dpi=300)
+    fig = plt.gcf()
+    fig.set_size_inches((11, 8.5), forward=False)
+    fig.savefig('../Graphs/Daily/current_graph.png', dpi=200)
+    fig.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=200)
 
     plt.show()
