@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import sys
 import csv
 from matplotlib import pyplot as plt
 from matplotlib import dates as mdates
@@ -81,4 +82,6 @@ with open('../CSVfiles/Daily/temp_Feinstaub.csv', mode='r') as feinstaub_file:
     fig.savefig('../Graphs/Daily/current_graph.png', dpi=200)
     fig.savefig('../Graphs/Daily/' + year + '-' + month + '-' + day + "_graph.png", dpi=200)
 
-    plt.show()
+    if len(sys.argv) > 1:
+        if str(sys.argv[1]) == "show":
+            plt.show()
