@@ -3,28 +3,33 @@
 import yagmail
 from datetime import date
 from datetime import timedelta
+import sys
+import os
 
+def send( year, month, day ):
+    print( os.path.abspath(__file__))
+    os.chdir(os.path.dirname(sys.argv[0]))
 
-receiver = "cridi92@web.de"
-body = " "
-filename = "../Graphs/Daily/current_graph.png"
+    receiver = "cridi92@web.de"
+    body = " "
+    filename = "../Graphs/Daily/current_graph.png"
 
-yag = yagmail.SMTP("cridilicious@gmail.com")
+    print("Filename: " + os.path.abspath(filename))
 
+    yag = yagmail.SMTP("klimaupdate@gmail.com")
 
-#Get todays Date
-today = date.today()
-# Yesterday date
-yesterday = today - timedelta(days = 1)
-#Adjust to linkformat
-year  = str(yesterday.year)
-month = str(yesterday.month) if yesterday.month >= 10 else "0"+str(yesterday.month)
-day   = str(yesterday.day)   if yesterday.day   >= 10 else "0"+str(yesterday.day)
+    yag.send(
+        to          = receiver,
+        subject     = "Tägliches Klimaupdate "  + year + '-' + month + '-' + day,
+        contents    = body,
+        attachments = os.path.abspath(filename),
+    )
 
+    print("Email sent!")
+    print("to: " + receiver)
 
-yag.send(
-    to          = receiver,
-    subject     = "Tägliches Klimaupdate "  + year + '-' + month + '-' + day,
-    contents    = body,
-    attachments = filename,
-)
+def main():
+    send("2020", "05", "08")
+
+if __name__ == "__main__":
+    main()
